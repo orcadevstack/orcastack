@@ -31,7 +31,7 @@ resource "kubernetes_namespace_v1" "platform" {
     name = var.namespace
     labels = {
       "app.kubernetes.io/part-of" = "orcastack"
-      "orcastack.io/governance"      = "enforced"
+      "orcastack.io/governance"   = "enforced"
     }
   }
 }
