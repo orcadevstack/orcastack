@@ -51,8 +51,10 @@ jobs:
       - name: Build frontend
         working-directory: orcastackweb
         env:
-          ORCASTACK_WEB_BASE: /${{ github.event.repository.name }}/
+          ORCASTACK_WEB_BASE: /orcastack/
         run: npm run build
+      - name: Add Pages SPA fallback
+        run: cp orcastackweb/dist/index.html orcastackweb/dist/404.html
       - name: Generate Pages signing keys
         run: |
           cd orcastackapi
