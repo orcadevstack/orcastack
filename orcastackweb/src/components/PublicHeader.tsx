@@ -1,3 +1,5 @@
+import { Layers3 } from 'lucide-react';
+
 import type { PublicRoute } from '../types';
 
 type PublicHeaderProps = {
@@ -19,9 +21,9 @@ export function PublicHeader({ currentPage, onNavigate, onLogin, onSignup }: Pub
     <header className="landing-header">
       <div className="landing-header__left">
         <div className="brand-lockup">
-          <span className="brand-mark">G</span>
+          <span className="brand-mark"><Layers3 aria-hidden="true" size={20} /></span>
           <div>
-            <span className="eyebrow">ORCASTACK</span>
+            <span className="eyebrow">OrcaStack</span>
           </div>
         </div>
         <strong>

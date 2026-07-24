@@ -329,156 +329,11 @@ func overviewData() (Overview, error) {
 		return Overview{}, err
 	}
 
-	cloudLayers := []CloudLayer{
-		{
-			Name:     "Bare metal and virtualization",
-			Platform: "Proxmox VE",
-			Status:   "ready",
-			Endpoint: "https://proxmox.internal.example:8006",
-			Identity: "orcastack:cloud:proxmox",
-			Summary:  "Bootstraps clustered KVM capacity for controller, worker, and GPU-backed VM pools.",
-			Coverage: []string{"Bare-metal installation", "VM-hosted control plane", "Clustered hypervisor orchestration"},
-		},
-		{
-			Name:     "Private IaaS",
-			Platform: "OpenStack",
-			Status:   "ready",
-			Endpoint: "https://keystone.internal.example:5000/v3",
-			Identity: "orcastack:cloud:openstack",
-			Summary:  "Manages controller and compute capacity, routed networking, floating IPs, and service identity.",
-			Coverage: []string{"Keystone identity", "Cinder and Ceph storage", "Security groups and load balancers"},
-		},
-		{
-			Name:     "Network fabric",
-			Platform: "OVN / OVS / FRR",
-			Status:   "ready",
-			Endpoint: "fabric://private-cloud/evpn",
-			Identity: "orcastack:cloud:fabric",
-			Summary:  "Provides routed multi-tenant networking with EVPN, VXLAN, and logical switch policy.",
-			Coverage: []string{"OVN logical networking", "Open vSwitch data plane", "FRR BGP and EVPN routing"},
-		},
-		{
-			Name:     "Container compute",
-			Platform: "Kubernetes",
-			Status:   "online",
-			Endpoint: "https://k8s.internal.example:6443",
-			Identity: "orcastack:cloud:kubernetes",
-			Summary:  "Runs cloud-native platform services, workload scheduling, and GPU-accelerated execution lanes.",
-			Coverage: []string{"General-purpose scheduling", "GPU scheduling", "Policy-governed runtime isolation"},
-		},
-		{
-			Name:     "Cluster management",
-			Platform: "Rancher",
-			Status:   "online",
-			Endpoint: "https://rancher.internal.example",
-			Identity: "orcastack:cloud:rancher",
-			Summary:  "Registers clusters, maps RBAC, and coordinates upgrades, fleet visibility, and node lifecycle.",
-			Coverage: []string{"Multi-cluster registration", "RBAC projection", "Upgrade and node lifecycle workflows"},
-		},
-	}
-
-	clusters := []Cluster{
-		{
-			ID:                 "orcastack-private-cloud",
-			Name:               "orcastack-private-cloud",
-			Provider:           "Rancher / RKE2",
-			Status:             "online",
-			Version:            "v1.31.2+rke2r1",
-			ControlPlanes:      3,
-			Workers:            5,
-			GPUWorkers:         2,
-			RancherProject:     "platform-ops",
-			RegistrationStatus: "registered",
-			UpgradePolicy:      "sequential-canary",
-			APIEndpoint:        "https://k8s.internal.example:6443",
-		},
-		{
-			ID:                 "orcastack-ai-factory",
-			Name:               "orcastack-ai-factory",
-			Provider:           "Rancher / Imported Cluster",
-			Status:             "syncing",
-			Version:            "v1.30.6+rke2r1",
-			ControlPlanes:      3,
-			Workers:            4,
-			GPUWorkers:         4,
-			RancherProject:     "ai-platform",
-			RegistrationStatus: "registration-token-ready",
-			UpgradePolicy:      "gpu-safe-window",
-			APIEndpoint:        "https://ai-cluster.internal.example:6443",
-		},
-	}
-
-	automationLanes := []AutomationLane{
-		{
-			Name:       "Cloud bootstrap",
-			Type:       "workflow",
-			Status:     "ready",
-			Entrypoint: "infra/automation/workflows/cloud-bootstrap.yaml",
-			Target:     "Proxmox, OpenStack, network fabric, Kubernetes, Rancher",
-			LastRun:    now,
-		},
-		{
-			Name:       "Rancher lifecycle",
-			Type:       "ansible",
-			Status:     "ready",
-			Entrypoint: "infra/ansible/playbooks/rancher-lifecycle.yml",
-			Target:     "Cluster registration, RBAC sync, upgrades, monitoring, node lifecycle",
-			LastRun:    now,
-		},
-		{
-			Name:       "Platform self-hosting",
-			Type:       "workflow",
-			Status:     "ready",
-			Entrypoint: "infra/automation/workflows/platform-self-hosting.yaml",
-			Target:     "Self-bootstrap, self-upgrade, self-monitoring",
-			LastRun:    now,
-		},
-	}
-
-	observability := []ObservabilitySurface{
-		{
-			Name:     "Prometheus",
-			Kind:     "metrics",
-			Status:   "running",
-			Endpoint: "https://prometheus.internal.example",
-			Backing:  "infra/kubernetes/platform/observability-stack.yaml",
-		},
-		{
-			Name:     "Grafana",
-			Kind:     "dashboards",
-			Status:   "running",
-			Endpoint: "https://grafana.internal.example",
-			Backing:  "infra/kubernetes/platform/observability-stack.yaml",
-		},
-		{
-			Name:     "Platform scrape config",
-			Kind:     "configuration",
-			Status:   "managed",
-			Endpoint: "config://orcastack-prometheus-scrape",
-			Backing:  "infra/kubernetes/platform/monitoring.yaml",
-		},
-	}
-
-	selfManagement := []SelfManagementCapability{
-		{
-			Name:     "Self-bootstrap",
-			Status:   "ready",
-			Workflow: "infra/automation/workflows/platform-self-hosting.yaml",
-			Summary:  "Deploys the ORCASTACK control plane into the management cluster from the governed bootstrap lane.",
-		},
-		{
-			Name:     "Self-upgrade",
-			Status:   "ready",
-			Workflow: "infra/automation/workflows/platform-self-hosting.yaml",
-			Summary:  "Rolls the gateway, runners, and platform services through a versioned upgrade lane with rollback checkpoints.",
-		},
-		{
-			Name:     "Self-monitoring",
-			Status:   "ready",
-			Workflow: "infra/automation/workflows/platform-self-hosting.yaml",
-			Summary:  "Publishes platform metrics, dashboards, and alerting hooks through the observability stack.",
-		},
-	}
+	cloudLayers := []CloudLayer{}
+	clusters := []Cluster{}
+	automationLanes := []AutomationLane{}
+	observability := []ObservabilitySurface{}
+	selfManagement := []SelfManagementCapability{}
 
 	repositories := make([]Repository, 0, len(metadataEntries))
 	cloneOperations := make([]CloneOperation, 0, len(metadataEntries))
@@ -530,148 +385,18 @@ func overviewData() (Overview, error) {
 		})
 	}
 
-	pipelines := []Pipeline{
-		{
-			ID:           "pipeline-cloud-bootstrap",
-			RepositoryID: firstRepositoryID(repositories),
-			Name:         "cloud-bootstrap",
-			Branch:       "main",
-			LastRun:      now,
-			Status:       "success",
-			Stages: []PipelineStage{
-				{Name: "proxmox", Status: "success"},
-				{Name: "openstack", Status: "success"},
-				{Name: "rancher", Status: "success"},
-				{Name: "observability", Status: "success"},
-			},
-			RunHistory: []PipelineRun{
-				{ID: "run-cloud-1042", StartedAt: now, Status: "success", Trigger: "operator"},
-				{ID: "run-cloud-1037", StartedAt: now, Status: "success", Trigger: "scheduled"},
-			},
-			LogChannel: "infra/automation/workflows/cloud-bootstrap.yaml",
-			UPI:        "orcastack:pipeline:cloud-bootstrap",
-			Security: SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-			UpdatedAt: now,
-		},
-		{
-			ID:           "pipeline-self-hosting",
-			RepositoryID: firstRepositoryID(repositories),
-			Name:         "platform-self-hosting",
-			Branch:       "main",
-			LastRun:      now,
-			Status:       "running",
-			Stages: []PipelineStage{
-				{Name: "bootstrap", Status: "success"},
-				{Name: "upgrade", Status: "running"},
-				{Name: "observe", Status: "pending"},
-			},
-			RunHistory: []PipelineRun{
-				{ID: "run-platform-212", StartedAt: now, Status: "running", Trigger: "release"},
-			},
-			LogChannel: "infra/automation/workflows/platform-self-hosting.yaml",
-			UPI:        "orcastack:pipeline:platform-self-hosting",
-			Security: SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-			UpdatedAt: now,
-		},
-	}
-
-	deployments := []Deployment{
-		{
-			ID:              "deploy-orcastack-control-plane",
-			RepositoryID:    firstRepositoryID(repositories),
-			ServiceName:     "orcastack-control-plane",
-			Version:         "2026.06.0",
-			Environment:     "management-cluster",
-			Status:          "running",
-			Cluster:         "orcastack-private-cloud",
-			Artifact:        "registry.internal.example/orcastack/platform:2026.06.0",
-			TargetCommit:    firstRepositoryCommit(repositories),
-			PreviousVersion: "2026.05.4",
-			LogChannel:      "orcastack:deploy:management-cluster",
-			UPI:             "orcastack:deployment:control-plane",
-			Security:        SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-		},
-		{
-			ID:              "deploy-observability-stack",
-			RepositoryID:    firstRepositoryID(repositories),
-			ServiceName:     "observability-stack",
-			Version:         "11.2.0",
-			Environment:     "platform-monitoring",
-			Status:          "success",
-			Cluster:         "orcastack-private-cloud",
-			Artifact:        "infra/kubernetes/platform/observability-stack.yaml",
-			TargetCommit:    firstRepositoryCommit(repositories),
-			PreviousVersion: "11.1.2",
-			LogChannel:      "orcastack:deploy:observability",
-			UPI:             "orcastack:deployment:observability",
-			Security:        SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-		},
-	}
-
-	containers := []Container{
-		{
-			Name:       "orcastack-gateway",
-			UPI:        "orcastack:runtime:gateway",
-			State:      "running",
-			Host:       "cp-01.internal.example",
-			Actions:    []string{"logs", "metrics", "restart"},
-			CPU:        "650m",
-			Memory:     "768Mi",
-			Restarts:   0,
-			MetricsURL: "https://prometheus.internal.example/graph?g0.expr=orcastack_gateway_requests_total",
-			LogChannel: "orcastack:runtime:gateway",
-			Security:   SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-		},
-		{
-			Name:       "rancher-controller",
-			UPI:        "orcastack:runtime:rancher-controller",
-			State:      "running",
-			Host:       "rancher-01.internal.example",
-			Actions:    []string{"logs", "metrics"},
-			CPU:        "900m",
-			Memory:     "1.2Gi",
-			Restarts:   1,
-			MetricsURL: "https://grafana.internal.example/d/rancher-control-plane",
-			LogChannel: "orcastack:runtime:rancher-controller",
-			Security:   SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-		},
-		{
-			Name:       "prometheus",
-			UPI:        "orcastack:runtime:prometheus",
-			State:      "running",
-			Host:       "obs-01.internal.example",
-			Actions:    []string{"metrics", "dashboards"},
-			CPU:        "1200m",
-			Memory:     "2Gi",
-			Restarts:   0,
-			MetricsURL: "https://prometheus.internal.example",
-			LogChannel: "orcastack:runtime:prometheus",
-			Security:   SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
-		},
-	}
-
-	events = append(events,
-		Event{ID: "evt-cloud-bootstrap", Time: now, Component: "cloud-bootstrap", Kind: "pipeline", RepositoryID: firstRepositoryID(repositories), Action: "bootstrap", Result: "success", UPI: "orcastack:event:cloud-bootstrap", Summary: "Private cloud foundation synchronized across Proxmox, OpenStack, networking, and Kubernetes."},
-		Event{ID: "evt-rancher-lifecycle", Time: now, Component: "rancher-lifecycle", Kind: "deployment", RepositoryID: firstRepositoryID(repositories), Action: "cluster-registration", Result: "success", UPI: "orcastack:event:rancher-lifecycle", Summary: "Rancher registration, RBAC mapping, and monitoring policy lanes are available for managed clusters."},
-		Event{ID: "evt-self-hosting", Time: now, Component: "platform-self-hosting", Kind: "process", RepositoryID: firstRepositoryID(repositories), Action: "self-upgrade", Result: "running", UPI: "orcastack:event:self-hosting", Summary: "ORCASTACK self-hosting lane is staged for bootstrap, upgrade, and observability validation."},
-	)
+	pipelines := []Pipeline{}
+	deployments := []Deployment{}
+	containers := []Container{}
 
 	metrics := []Metric{
 		{Label: "Projects tracked", Value: fmt.Sprintf("%d", len(repositories)), Hint: "Repositories available for clone and push through the local control plane."},
 		{Label: "Hosted locally", Value: fmt.Sprintf("%d", providerCounts["orcastack"]), Hint: "Bare repositories created directly inside the orcastack repo store."},
 		{Label: "Imported remotes", Value: fmt.Sprintf("%d", importedCount), Hint: "Repositories mirrored from external Git sources."},
 		{Label: "Push targets ready", Value: fmt.Sprintf("%d", len(repositories)), Hint: "Each project exposes an HTTP Git remote you can clone from and push to over the network."},
-		{Label: "Cloud layers managed", Value: fmt.Sprintf("%d", len(cloudLayers)), Hint: "Bare metal, OpenStack, fabric, Kubernetes, and Rancher surfaces mapped into the control plane."},
-		{Label: "Clusters under Rancher", Value: fmt.Sprintf("%d", len(clusters)), Hint: "Management and workload clusters available for lifecycle operations and registration."},
 	}
 
-	activity := []string{
-		"Create local projects as bare Git remotes from the dashboard.",
-		"Import existing repositories with git clone --mirror.",
-		"Clone or push through HTTP Git remotes exposed by the gateway.",
-		"Run full private-cloud bootstrap across Proxmox, OpenStack, networking, Kubernetes, and Rancher.",
-		"Operate self-hosting lanes for ORCASTACK bootstrap, upgrades, and monitoring.",
-	}
+	activity := []string{}
 
 	overview := Overview{
 		Providers:       providers,
@@ -684,7 +409,7 @@ func overviewData() (Overview, error) {
 		Security: DashboardSecurity{
 			RepositoryIdentity: "orcastack:directory:repositories",
 			UIProcessIdentity:  "orcastack:ui:control-plane",
-			Directory:          SecurityState{LDAPRegistered: true, RBACVerified: true, AttestationSigned: true, Verified: true},
+			Directory:          SecurityState{},
 		},
 		Events:          events,
 		UpdatedAt:       now,
@@ -700,22 +425,6 @@ func overviewData() (Overview, error) {
 	enrichOverviewFromLiveAPIs(&overview, now)
 
 	return overview, nil
-}
-
-func firstRepositoryID(repositories []Repository) string {
-	if len(repositories) == 0 {
-		return "platform-control-plane"
-	}
-
-	return repositories[0].ID
-}
-
-func firstRepositoryCommit(repositories []Repository) string {
-	if len(repositories) == 0 {
-		return "infra-snapshot"
-	}
-
-	return repositories[0].Commit
 }
 
 func createRepository(req createRepositoryRequest) (repositoryMutationResponse, error) {

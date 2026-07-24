@@ -47,6 +47,18 @@ export async function fetchRunnerPipelines(signal?: AbortSignal): Promise<{ pipe
   return requestRunner<{ pipelines: RunnerPipeline[]; summary: RunnerSummary }>('/pipelines', { signal });
 }
 
+export async function createRunnerPipeline(): Promise<RunnerPipeline> {
+  return requestRunner<RunnerPipeline>('/pipelines', {
+    method: 'POST',
+    body: {
+      project: 'orcastack/platform',
+      ref: 'main',
+      trigger: 'manual',
+      workflow: 'api-test',
+    },
+  });
+}
+
 export async function fetchRunnerJobs(signal?: AbortSignal): Promise<{ jobs: RunnerJob[]; summary: RunnerSummary }> {
   return requestRunner<{ jobs: RunnerJob[]; summary: RunnerSummary }>('/jobs', { signal });
 }

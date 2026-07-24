@@ -216,6 +216,149 @@ export type AuthSession = {
   expires_at: string;
 };
 
+export type HeaderSection = 'projects' | 'deployments' | 'accounts' | 'settings' | 'profile';
+
+export type HeaderNavigationItem = {
+  id: string;
+  section: HeaderSection;
+  label: string;
+  description: string;
+  path: string;
+  icon: string;
+  action: 'navigate' | 'logout';
+  count?: number;
+};
+
+export type HeaderNavigation = {
+  organization: string;
+  tagline: string;
+  items: HeaderNavigationItem[];
+  updated_at: string;
+};
+
+export type OrganizationRole = 'owner' | 'maintainer' | 'developer';
+
+export type OrganizationSummary = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  website: string;
+  role: OrganizationRole;
+  member_count: number;
+  team_count: number;
+  project_count: number;
+  created_at: string;
+};
+
+export type OrganizationMember = {
+  username: string;
+  role: OrganizationRole;
+  created_at: string;
+};
+
+export type OrganizationTeam = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  member_count: number;
+  created_at: string;
+};
+
+export type OrganizationProject = {
+  id: string;
+  name: string;
+  description: string;
+  repository_name: string;
+  team_id?: string;
+  team_name?: string;
+  branch_strategy: 'feature' | 'release' | 'hotfix';
+  default_branch: string;
+  status: string;
+  clone_url: string;
+  created_at: string;
+};
+
+export type OrganizationActivity = {
+  id: string;
+  actor: string;
+  action: string;
+  resource_type: string;
+  resource_id: string;
+  summary: string;
+  occurred_at: string;
+};
+
+export type OrganizationDetail = {
+  organization: OrganizationSummary;
+  members: OrganizationMember[];
+  teams: OrganizationTeam[];
+  projects: OrganizationProject[];
+  activity: OrganizationActivity[];
+};
+
+export type PublicDeployment = {
+  id: string;
+  project_slug: string;
+  project_name: string;
+  repository_name: string;
+  environment: string;
+  target_kind: string;
+  status: string;
+  build_status: string;
+  commit_sha: string;
+  updated_at: string;
+  dashboard_path: string;
+  can_access_dashboard: boolean;
+};
+
+export type PublicHome = {
+  deployments: PublicDeployment[];
+  recent_builds: PublicDeployment[];
+  community: { posts: number; contributors: number; events: number };
+  viewer_role: 'admin' | 'developer' | 'viewer';
+  updated_at: string;
+};
+
+export type CommunityPost = {
+  id: string;
+  slug: string;
+  kind: 'discussion' | 'tutorial' | 'announcement' | 'project';
+  title: string;
+  excerpt: string;
+  markdown: string;
+  media_url: string;
+  author_username: string;
+  featured: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CommunityContributor = {
+  username: string;
+  display_name: string;
+  contributions: number;
+};
+
+export type CommunityEvent = {
+  id: string;
+  title: string;
+  summary: string;
+  starts_at: string;
+  ends_at: string;
+  location: string;
+  event_url: string;
+};
+
+export type PublicCommunity = {
+  posts: CommunityPost[];
+  contributors: CommunityContributor[];
+  events: CommunityEvent[];
+  can_publish: boolean;
+  viewer_role: 'admin' | 'developer' | 'viewer';
+};
+
 export type SignupRequestInput = {
   username: string;
   email: string;

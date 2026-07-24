@@ -262,12 +262,20 @@ type Metric struct {
 }
 
 func Register(mux *http.ServeMux) {
+	mux.HandleFunc("/api/public/home", handlePublicHome)
+	mux.HandleFunc("/api/public/community", handlePublicCommunity)
+	mux.HandleFunc("/api/public/audit", handlePublicHubAudit)
 	mux.HandleFunc("/api/auth/login", handleLogin)
 	mux.HandleFunc("/api/auth/signup", handleSignup)
 	mux.HandleFunc("/api/auth/signup-requests", requireAuth(handleSignupRequests))
 	mux.HandleFunc("/api/auth/signup-requests/", requireAuth(handleSignupRequestReview))
 	mux.HandleFunc("/api/auth/session", handleSession)
 	mux.HandleFunc("/api/auth/logout", handleLogout)
+	mux.HandleFunc("/api/header/navigation", requireAuth(handleHeaderNavigation))
+	mux.HandleFunc("/api/header/audit", requireAuth(handleHeaderAudit))
+	mux.HandleFunc("/api/organizations", requireAuth(handleOrganizations))
+	mux.HandleFunc("/api/organizations/", requireAuth(handleOrganization))
+	mux.HandleFunc("/api/community/posts", requireAuth(handleCommunityPosts))
 	mux.HandleFunc("/git/", serveGitHTTP)
 
 	mux.HandleFunc("/api/providers", requireAuth(func(w http.ResponseWriter, _ *http.Request, _ sessionRecord) {

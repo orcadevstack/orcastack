@@ -110,7 +110,7 @@ export function DashboardPage({
                     </tr>
                   </thead>
                   <tbody>
-                    {(overview?.repositories ?? []).map((repository) => (
+                    {(overview?.repositories ?? []).length === 0 ? <tr><td className="dashboard-empty" colSpan={4}>No repositories have been created or imported.</td></tr> : (overview?.repositories ?? []).map((repository) => (
                       <tr key={repository.id}>
                         <td>{repository.name}</td>
                         <td>{repository.default_branch}</td>
@@ -135,7 +135,7 @@ export function DashboardPage({
                     </tr>
                   </thead>
                   <tbody>
-                    {(overview?.pipelines ?? []).map((pipeline) => (
+                    {(overview?.pipelines ?? []).length === 0 ? <tr><td className="dashboard-empty" colSpan={4}>No pipeline runs have been recorded.</td></tr> : (overview?.pipelines ?? []).map((pipeline) => (
                       <tr key={pipeline.id}>
                         <td>{pipeline.name}</td>
                         <td>{pipeline.branch}</td>
@@ -160,7 +160,7 @@ export function DashboardPage({
                     </tr>
                   </thead>
                   <tbody>
-                    {(overview?.deployments ?? []).map((deployment) => (
+                    {(overview?.deployments ?? []).length === 0 ? <tr><td className="dashboard-empty" colSpan={4}>No deployments have been recorded.</td></tr> : (overview?.deployments ?? []).map((deployment) => (
                       <tr key={deployment.id}>
                         <td>{deployment.service_name}</td>
                         <td>{deployment.environment}</td>
@@ -189,7 +189,7 @@ export function DashboardPage({
                 </div>
               </div>
               <ul className="stack-list">
-                {(dashboard.runner?.pipelines ?? []).map((pipeline) => (
+                {(dashboard.runner?.pipelines ?? []).length === 0 ? <li className="dashboard-empty">No runner pipelines are active.</li> : (dashboard.runner?.pipelines ?? []).map((pipeline) => (
                   <li key={pipeline.id}>
                     <div>
                       <strong>{pipeline.project}</strong>
@@ -203,7 +203,7 @@ export function DashboardPage({
 
             <Section description="Connected endpoints, locations, and device health." title="Devices">
               <ul className="stack-list">
-                {(dashboard.devices?.devices ?? []).map((device) => (
+                {(dashboard.devices?.devices ?? []).length === 0 ? <li className="dashboard-empty">No devices are registered.</li> : (dashboard.devices?.devices ?? []).map((device) => (
                   <li key={device.id}>
                     <div>
                       <strong>{device.name}</strong>
@@ -217,7 +217,7 @@ export function DashboardPage({
 
             <Section description="Hardware and software workflows coordinated by one platform." title="Automation lanes">
               <ul className="stack-list">
-                {automationRows.map((workflow) => (
+                {automationRows.length === 0 ? <li className="dashboard-empty">No automation workflows are registered.</li> : automationRows.map((workflow) => (
                   <li key={workflow.id}>
                     <div>
                       <strong>{workflow.name}</strong>
@@ -231,7 +231,7 @@ export function DashboardPage({
 
             <Section description="Recent platform events, results, and affected components." title="Activity stream">
               <ul className="event-list">
-                {(overview?.events ?? []).slice(0, 6).map((event) => (
+                {(overview?.events ?? []).length === 0 ? <li className="dashboard-empty">No platform activity has been recorded.</li> : (overview?.events ?? []).slice(0, 6).map((event) => (
                   <li key={event.id}>
                     <div>
                       <strong>{event.action}</strong>
@@ -259,7 +259,7 @@ export function DashboardPage({
                       </tr>
                     </thead>
                     <tbody>
-                      {dashboard.signupRequests.map((request: SignupRequestRecord) => (
+                      {dashboard.signupRequests.length === 0 ? <tr><td className="dashboard-empty" colSpan={4}>No access requests are pending.</td></tr> : dashboard.signupRequests.map((request: SignupRequestRecord) => (
                         <tr key={request.id}>
                           <td>{request.username}</td>
                           <td>{request.email}</td>

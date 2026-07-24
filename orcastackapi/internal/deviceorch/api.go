@@ -18,11 +18,7 @@ type Device struct {
 }
 
 func Register(mux *http.ServeMux) {
-	devices := []Device{
-		{ID: "dev-001", Name: "arm-board-01", Status: "busy", Health: "healthy", Tags: []string{"arm64", "serial-console", "lab-a"}, Location: "rack-a3", Capabilities: []string{"flash", "power-cycle", "uart"}, AssignedRun: "pipe-001"},
-		{ID: "dev-002", Name: "sensor-rig-07", Status: "idle", Health: "healthy", Tags: []string{"iot", "wifi", "lab-c"}, Location: "rack-c1", Capabilities: []string{"telemetry", "camera", "power-cycle"}},
-		{ID: "dev-003", Name: "fpga-node-02", Status: "offline", Health: "degraded", Tags: []string{"fpga", "lab-b"}, Location: "rack-b2", Capabilities: []string{"jtag", "power-cycle"}},
-	}
+	devices := []Device{}
 
 	mux.HandleFunc("/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/devices" {
@@ -31,7 +27,7 @@ func Register(mux *http.ServeMux) {
 		}
 		respondJSON(w, http.StatusOK, map[string]any{
 			"devices": devices,
-			"summary": map[string]int{"total": len(devices), "healthy": 2, "busy": 1, "offline": 1},
+			"summary": map[string]int{"total": len(devices), "healthy": 0, "busy": 0, "offline": 0},
 		})
 	})
 
@@ -48,9 +44,7 @@ func Register(mux *http.ServeMux) {
 
 	mux.HandleFunc("/allocations", func(w http.ResponseWriter, r *http.Request) {
 		respondJSON(w, http.StatusOK, map[string]any{
-			"allocations": []map[string]string{
-				{"device_id": "dev-001", "pipeline_id": "pipe-001", "status": "active"},
-			},
+			"allocations": []map[string]string{},
 		})
 	})
 }

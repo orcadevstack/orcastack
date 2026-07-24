@@ -4,6 +4,8 @@ import type { DashboardState } from '../types';
 
 type PipelinesPageProps = {
   dashboard: DashboardState;
+  onRunPipeline: () => void;
+  pipelineBusy: boolean;
 };
 
 function formatDateTime(value?: string) {
@@ -22,7 +24,7 @@ function formatDateTime(value?: string) {
   }).format(parsed);
 }
 
-export function PipelinesPage({ dashboard }: PipelinesPageProps) {
+export function PipelinesPage({ dashboard, onRunPipeline, pipelineBusy }: PipelinesPageProps) {
   const pipelines = dashboard.overview?.pipelines ?? [];
   const runnerPipelines = dashboard.runner?.pipelines ?? [];
 
@@ -71,7 +73,15 @@ export function PipelinesPage({ dashboard }: PipelinesPageProps) {
           </DataTable>
         </Section>
 
-        <Section description="Runner fleet execution view with refs and current trigger path." title="Runner execution">
+        <Section
+          actions={(
+            <button className="primary-button primary-button--warm" disabled={pipelineBusy} onClick={onRunPipeline} type="button">
+              {pipelineBusy ? 'Running tests...' : 'Run API tests'}
+            </button>
+          )}
+          description="Runner fleet execution view with refs and current trigger path."
+          title="Runner execution"
+        >
           <ul className="stack-list">
             {runnerPipelines.map((pipeline) => (
               <li key={pipeline.id}>

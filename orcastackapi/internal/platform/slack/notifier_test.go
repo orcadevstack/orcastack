@@ -26,6 +26,10 @@ func TestNotifierClientSend(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		if r.Header.Get("Authorization") != "Bearer test-token" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 
 		body, _ := io.ReadAll(r.Body)
 		var msg Message
@@ -45,10 +49,7 @@ func TestNotifierClientSend(t *testing.T) {
 	// Create notifier with test server URL
 	notifier := NewNotifierClient("test-token", true)
 	notifier.httpClient = server.Client()
-
-	// Override the Slack API URL temporarily
-	oldURL := "https://slack.com/api/chat.postMessage"
-	_ = oldURL // We're using the test server
+	notifier.apiURL = server.URL
 
 	blocks := []Block{
 		NewSectionBlock("Test message"),

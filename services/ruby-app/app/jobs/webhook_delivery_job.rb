@@ -1,5 +1,5 @@
 begin
-  require 'sidekiq/job'
+  require 'sidekiq'
 rescue LoadError
 end
 

@@ -180,7 +180,7 @@ services:
       ORCASTACK_REVIEW_IDENTITY: ${ORCASTACK_REVIEW_IDENTITY:-orca:service:4cc2c0ec-0af8-4d25-a565-a301e2e8f324}
       <<: *orcastack-security-env
     ports:
-      - "8087:8082"
+      - "8090:8082"
       - "9082:9082"
     depends_on:
       git-service:
@@ -420,9 +420,12 @@ services:
     command: sh -c "npm install && npm run build && npm run preview -- --host 0.0.0.0 --port 5050"
     volumes:
       - ./orcastackweb:/workspace/orcastackweb
+      - ./scripts/npm-force-registry-ip.js:/workspace/scripts/npm-force-registry-ip.js:ro
       - orcastackweb_node_modules:/workspace/orcastackweb/node_modules
+    environment:
+      NODE_OPTIONS: --require=/workspace/scripts/npm-force-registry-ip.js
     ports:
-      - "5050:5050"
+      - "5051:5050"
     depends_on:
       gateway:
         condition: service_started

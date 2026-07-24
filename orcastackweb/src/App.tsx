@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import {
+  createRunnerPipeline,
   fetchDevices,
   fetchHardwareWorkflows,
   fetchOverview,
@@ -20,12 +21,16 @@ import { PublicFooter } from './components/PublicFooter';
 import { PublicHeader } from './components/PublicHeader';
 import { WorkspaceLayout } from './components/WorkspaceLayout';
 import { AutomationPage } from './pages/AutomationPage';
+import { AccountsPage } from './pages/AccountsPage';
+import { AuthPage } from './pages/AuthPage';
 import { DevicesPage } from './pages/DevicesPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { DeploymentsPage } from './pages/DeploymentsPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { DeveloperPage } from './pages/DeveloperPage';
 import { DocsPage } from './pages/DocsPage';
 import { HomePage } from './pages/HomePage';
+import { OrganizationsPage } from './pages/OrganizationsPage';
 import { PipelinesPage } from './pages/PipelinesPage';
 import { RepositoriesPage } from './pages/RepositoriesPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -71,7 +76,6 @@ function pathToPublicRoute(pathname: string): PublicRoute {
 }
 
 export function App() {
-  const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authToken, setAuthToken] = useState<string | null>(() => readStoredAuthToken());
   const [authSession, setAuthSession] = useState<AuthSession | null>(null);
   const [dashboard, setDashboard] = useState<DashboardState>(emptyDashboardState);
@@ -82,6 +86,7 @@ export function App() {
   const [loginForm, setLoginForm] = useState({ username: 'admin', password: 'admin12345' });
   const [signupForm, setSignupForm] = useState({ username: '', email: '', password: '' });
   const [reviewBusyId, setReviewBusyId] = useState<string | null>(null);
+  const [pipelineBusy, setPipelineBusy] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -189,8 +194,8 @@ export function App() {
     try {
       const result = await signup(signupForm, undefined);
       setNotice(result.message);
-      setAuthMode('login');
       setSignupForm({ username: '', email: '', password: '' });
+      navigate('/login', { replace: true });
     } catch (signupError) {
       const message = signupError instanceof Error ? signupError.message : 'Signup failed';
       setError(message);
@@ -238,28 +243,54 @@ export function App() {
     }
   }
 
+  async function handleRunPipeline() {
+    setPipelineBusy(true);
+    setError(null);
+
+    try {
+      const pipeline = await createRunnerPipeline();
+      setDashboard((current) => ({
+        ...current,
+        runner: current.runner
+          ? {
+              ...current.runner,
+              pipelines: [pipeline, ...current.runner.pipelines],
+              summary: {
+                ...current.runner.summary,
+                queued_jobs: current.runner.summary.queued_jobs + 1,
+              },
+            }
+          : current.runner,
+      }));
+
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        const runner = await fetchRunnerPipelines();
+        setDashboard((current) => ({ ...current, runner }));
+
+        const updated = runner.pipelines.find((candidate) => candidate.id === pipeline.id);
+        if (updated && updated.status !== 'queued' && updated.status !== 'running') {
+          break;
+        }
+      }
+    } catch (pipelineError) {
+      const message = pipelineError instanceof Error ? pipelineError.message : 'Pipeline execution failed';
+      setError(message);
+    } finally {
+      setPipelineBusy(false);
+    }
+  }
+
   function navigatePublic(route: PublicRoute) {
     const nextPath = route === 'home' ? '/' : `/${route}`;
     navigate(nextPath);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function openAuthPanel(mode: AuthMode) {
-    setAuthMode(mode);
-
-    if (location.pathname !== '/') {
-      navigate('/', { replace: false });
-    }
-
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        document.getElementById('access-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
+  function openAuthPage(mode: AuthMode) {
+    setError(null);
+    setNotice(null);
+    navigate(mode === 'login' ? '/login' : '/request-access');
   }
 
   if (authToken && authChecking && !authSession) {
@@ -281,23 +312,8 @@ export function App() {
           path="/"
           element={
             <main className="public-shell">
-              <PublicHeader currentPage="home" onLogin={() => openAuthPanel('login')} onNavigate={navigatePublic} onSignup={() => openAuthPanel('signup')} />
-              <HomePage
-                authChecking={authChecking}
-                authMode={authMode}
-                error={error}
-                loading={loading}
-                loginForm={loginForm}
-                notice={notice}
-                onAuthModeChange={setAuthMode}
-                onLogin={() => openAuthPanel('login')}
-                onLoginFieldChange={(field, value) => setLoginForm((current) => ({ ...current, [field]: value }))}
-                onLoginSubmit={handleLogin}
-                onSignup={() => openAuthPanel('signup')}
-                onSignupFieldChange={(field, value) => setSignupForm((current) => ({ ...current, [field]: value }))}
-                onSignupSubmit={handleSignup}
-                signupForm={signupForm}
-              />
+              <PublicHeader currentPage="home" onLogin={() => openAuthPage('login')} onNavigate={navigatePublic} onSignup={() => openAuthPage('signup')} />
+              <HomePage onLogin={() => openAuthPage('login')} />
               <PublicFooter />
             </main>
           }
@@ -306,8 +322,8 @@ export function App() {
           path="/docs"
           element={
             <main className="public-shell">
-              <PublicHeader currentPage="docs" onLogin={() => openAuthPanel('login')} onNavigate={navigatePublic} onSignup={() => openAuthPanel('signup')} />
-              <DocsPage onLogin={() => openAuthPanel('login')} onSignup={() => openAuthPanel('signup')} />
+              <PublicHeader currentPage="docs" onLogin={() => openAuthPage('login')} onNavigate={navigatePublic} onSignup={() => openAuthPage('signup')} />
+              <DocsPage onLogin={() => openAuthPage('login')} onSignup={() => openAuthPage('signup')} />
               <PublicFooter />
             </main>
           }
@@ -316,8 +332,8 @@ export function App() {
           path="/developer"
           element={
             <main className="public-shell">
-              <PublicHeader currentPage="developer" onLogin={() => openAuthPanel('login')} onNavigate={navigatePublic} onSignup={() => openAuthPanel('signup')} />
-              <DeveloperPage onLogin={() => openAuthPanel('login')} onSignup={() => openAuthPanel('signup')} />
+              <PublicHeader currentPage="developer" onLogin={() => openAuthPage('login')} onNavigate={navigatePublic} onSignup={() => openAuthPage('signup')} />
+              <DeveloperPage onLogin={() => openAuthPage('login')} onSignup={() => openAuthPage('signup')} />
               <PublicFooter />
             </main>
           }
@@ -326,10 +342,50 @@ export function App() {
           path="/community"
           element={
             <main className="public-shell">
-              <PublicHeader currentPage="community" onLogin={() => openAuthPanel('login')} onNavigate={navigatePublic} onSignup={() => openAuthPanel('signup')} />
-              <CommunityPage onLogin={() => openAuthPanel('login')} onSignup={() => openAuthPanel('signup')} />
+              <PublicHeader currentPage="community" onLogin={() => openAuthPage('login')} onNavigate={navigatePublic} onSignup={() => openAuthPage('signup')} />
+              <CommunityPage onLogin={() => openAuthPage('login')} onSignup={() => openAuthPage('signup')} />
               <PublicFooter />
             </main>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <AuthPage
+              authChecking={authChecking}
+              authMode="login"
+              error={error}
+              loading={loading}
+              loginForm={loginForm}
+              notice={notice}
+              onAuthModeChange={openAuthPage}
+              onBack={() => navigate('/')}
+              onLoginFieldChange={(field, value) => setLoginForm((current) => ({ ...current, [field]: value }))}
+              onLoginSubmit={handleLogin}
+              onSignupFieldChange={(field, value) => setSignupForm((current) => ({ ...current, [field]: value }))}
+              onSignupSubmit={handleSignup}
+              signupForm={signupForm}
+            />
+          }
+        />
+        <Route
+          path="/request-access"
+          element={
+            <AuthPage
+              authChecking={authChecking}
+              authMode="signup"
+              error={error}
+              loading={loading}
+              loginForm={loginForm}
+              notice={notice}
+              onAuthModeChange={openAuthPage}
+              onBack={() => navigate('/')}
+              onLoginFieldChange={(field, value) => setLoginForm((current) => ({ ...current, [field]: value }))}
+              onLoginSubmit={handleLogin}
+              onSignupFieldChange={(field, value) => setSignupForm((current) => ({ ...current, [field]: value }))}
+              onSignupSubmit={handleSignup}
+              signupForm={signupForm}
+            />
           }
         />
         <Route path="/app/*" element={<Navigate replace to="/" />} />
@@ -358,6 +414,23 @@ export function App() {
             title="Platform dashboard"
           >
             <DashboardPage dashboard={dashboard} isPlatformAdmin={isPlatformAdmin} onReview={handleReview} reviewBusyId={reviewBusyId} />
+          </WorkspaceLayout>
+        }
+      />
+      <Route
+        path="/app/organizations"
+        element={
+          <WorkspaceLayout
+            authSession={authSession}
+            dashboard={dashboard}
+            error={error}
+            loading={loading}
+            onLogout={handleLogout}
+            onRefresh={() => window.location.reload()}
+            summary="Group projects under organizations, assign teams and roles, provision repositories, and inspect audited engineering activity."
+            title="Organizations"
+          >
+            <OrganizationsPage authSession={authSession} />
           </WorkspaceLayout>
         }
       />
@@ -391,7 +464,7 @@ export function App() {
             summary="Track pipeline inventory, execution state, and runner utilization through dedicated route-based navigation."
             title="Pipelines"
           >
-            <PipelinesPage dashboard={dashboard} />
+            <PipelinesPage dashboard={dashboard} onRunPipeline={handleRunPipeline} pipelineBusy={pipelineBusy} />
           </WorkspaceLayout>
         }
       />
@@ -426,6 +499,40 @@ export function App() {
             title="Automation"
           >
             <AutomationPage dashboard={dashboard} />
+          </WorkspaceLayout>
+        }
+      />
+      <Route
+        path="/app/deployments"
+        element={
+          <WorkspaceLayout
+            authSession={authSession}
+            dashboard={dashboard}
+            error={error}
+            loading={loading}
+            onLogout={handleLogout}
+            onRefresh={() => window.location.reload()}
+            summary="Track controlled releases, target environments, artifact identity, and deployment health across the platform."
+            title="Deployments"
+          >
+            <DeploymentsPage dashboard={dashboard} />
+          </WorkspaceLayout>
+        }
+      />
+      <Route
+        path="/app/accounts"
+        element={
+          <WorkspaceLayout
+            authSession={authSession}
+            dashboard={dashboard}
+            error={error}
+            loading={loading}
+            onLogout={handleLogout}
+            onRefresh={() => window.location.reload()}
+            summary="Review your authenticated identity, RBAC scope, session lifetime, and authorized account governance."
+            title="Accounts"
+          >
+            <AccountsPage authSession={authSession} dashboard={dashboard} isPlatformAdmin={isPlatformAdmin} />
           </WorkspaceLayout>
         }
       />

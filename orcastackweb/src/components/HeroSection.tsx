@@ -1,98 +1,36 @@
-import { StatusPill } from './StatusPill';
+import { lazy, Suspense } from 'react';
+import { ArrowRight, BookOpenText, Rocket, UsersRound } from 'lucide-react';
 
-const landingPillars = [
-  'Review and repository governance',
-  'Runner and deployment orchestration',
-  'Hardware and software automation lanes',
-  'Security, policy, and access controls',
-];
-
-const landingTimeline = [
-  { label: 'Plan', value: 'Codify review, policy, and release contracts' },
-  { label: 'Build', value: 'Scale runners, queues, and device-backed validation' },
-  { label: 'Ship', value: 'Promote through controlled environments with traceability' },
-];
+const PublicHeroScene = lazy(() => import('./PublicHeroScene').then((module) => ({ default: module.PublicHeroScene })));
 
 type HeroSectionProps = {
-  onLogin: () => void;
-  onSignup: () => void;
+  onDeploy: () => void;
+  onCommunity: () => void;
+  onDocs: () => void;
 };
 
-export function HeroSection({ onLogin, onSignup }: HeroSectionProps) {
+export function HeroSection({ onDeploy, onCommunity, onDocs }: HeroSectionProps) {
   return (
-    <section className="hero-grid" id="platform">
-      <div className="hero-copy">
-        <div className="hero-copy__intro">
-          <span className="eyebrow">The complete DevSecOps platform</span>
-          <div className="hero-kicker">
-            <span>Plan</span>
-            <span>Code</span>
-            <span>Secure</span>
-            <span>Deploy</span>
-            <span>Operate</span>
-          </div>
-          <h1>One control plane for source code, delivery pipelines, devices, and policy.</h1>
-          <p>
-            Built for internal engineering organizations that want a GitLab-style front door with stronger control over hardware labs,
-            software automation, approval flows, and runtime operations.
-          </p>
-          <p className="hero-copy__supporting">
-            Repositories, runners, deployments, access requests, and operational telemetry stay connected in one premium interface instead of being split across disconnected tools.
-          </p>
+    <section className="public-hero" id="platform">
+      <Suspense fallback={<div aria-hidden="true" className="public-hero-scene public-hero-scene--loading" />}><PublicHeroScene /></Suspense>
+      <div className="public-hero__shade" />
+      <div className="public-hero__content">
+        <span className="public-hero__signal"><span /> Developer control plane</span>
+        <h1>OrcaStack</h1>
+        <p className="public-hero__tagline">Build. Secure. Ship. Operate.</p>
+        <p className="public-hero__lede">One governed system for source, CI/CD, private-cloud delivery, and hardware-backed automation.</p>
+        <div className="public-hero__actions">
+          <button className="primary-button primary-button--warm" onClick={onDeploy} type="button"><Rocket aria-hidden="true" size={17} /> Deploy <ArrowRight aria-hidden="true" size={15} /></button>
+          <button className="secondary-button" onClick={onCommunity} type="button"><UsersRound aria-hidden="true" size={17} /> Join Community</button>
+          <button className="secondary-button secondary-button--ghost" onClick={onDocs} type="button"><BookOpenText aria-hidden="true" size={17} /> Explore Docs</button>
         </div>
-        <div className="hero-actions">
-          <button className="primary-button primary-button--warm" onClick={onSignup} type="button">
-            Start free evaluation
-          </button>
-          <button className="secondary-button secondary-button--ghost" onClick={onLogin} type="button">
-            Sign in to workspace
-          </button>
+        <div className="public-hero__proof" aria-label="Platform capabilities">
+          <span><strong>Source</strong> governed repositories</span>
+          <span><strong>Delivery</strong> policy-aware releases</span>
+          <span><strong>Automation</strong> software and devices</span>
         </div>
-        <div className="hero-proofstrip" aria-label="Product proof points">
-          <div>
-            <span>Single application</span>
-            <strong>Source to production visibility</strong>
-          </div>
-          <div>
-            <span>Built-in governance</span>
-            <strong>Approvals, policies, auditability</strong>
-          </div>
-          <div>
-            <span>Hybrid execution</span>
-            <strong>Cloud runners and physical device labs</strong>
-          </div>
-        </div>
-        <ul className="hero-pillars">
-          {landingPillars.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
       </div>
-
-      <aside className="hero-console" aria-label="Platform summary">
-        <div className="hero-console__header">
-          <span>Platform overview</span>
-          <StatusPill value="healthy" />
-        </div>
-        <div className="hero-console__body">
-          {landingTimeline.map((item) => (
-            <article className="hero-console__row" key={item.label}>
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-            </article>
-          ))}
-        </div>
-        <div className="hero-console__footer">
-          <div>
-            <span>Core modules</span>
-            <strong>Repos, CI/CD, labs, governance</strong>
-          </div>
-          <div>
-            <span>Operating model</span>
-            <strong>Role-based access with approvals</strong>
-          </div>
-        </div>
-      </aside>
+      <a className="public-hero__next" href="#deployments">Live platform integration <ArrowRight aria-hidden="true" size={15} /></a>
     </section>
   );
 }

@@ -14,6 +14,7 @@ import (
 // NotifierClient handles Slack message sending
 type NotifierClient struct {
 	botToken   string
+	apiURL     string
 	httpClient *http.Client
 	mu         sync.RWMutex
 	enabled    bool
@@ -24,6 +25,7 @@ type NotifierClient struct {
 func NewNotifierClient(botToken string, enabled bool) *NotifierClient {
 	return &NotifierClient{
 		botToken: botToken,
+		apiURL:   "https://slack.com/api/chat.postMessage",
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -63,7 +65,7 @@ type TextBlock struct {
 
 // ImageBlock represents an image in a Slack block
 type ImageBlock struct {
-	URL    string `json:"url"`
+	URL     string `json:"url"`
 	AltText string `json:"alt_text"`
 }
 
@@ -175,7 +177,7 @@ func (nc *NotifierClient) send(ctx context.Context, msg *Message) error {
 
 // sendRequest performs a single HTTP POST request to Slack
 func (nc *NotifierClient) sendRequest(ctx context.Context, botToken string, payload []byte) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://slack.com/api/chat.postMessage", bytes.NewReader(payload))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, nc.apiURL, bytes.NewReader(payload))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}

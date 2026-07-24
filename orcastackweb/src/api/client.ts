@@ -5,6 +5,7 @@ type RequestOptions = {
   token?: string | null;
   method?: 'GET' | 'POST' | 'PATCH';
   body?: unknown;
+  keepalive?: boolean;
 };
 
 const configuredGatewayBase = import.meta.env.VITE_ORCASTACK_GATEWAY_URL;
@@ -118,6 +119,7 @@ async function requestJSON<T>(candidates: string[], path: string, options: Reque
         method: options.method || 'GET',
         headers,
         body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+        keepalive: options.keepalive,
       });
 
       if (!response.ok) {

@@ -104,3 +104,5 @@ module OrcaStack
     end
   end
 end
+
+OrcaStack::RubyApp::Server.start if $PROGRAM_NAME == __FILE__
