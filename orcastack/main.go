@@ -27,18 +27,29 @@ func main() {
 	switch args[0] {
 	case "help", "--help", "-h":
 		printHelp()
+
 	case "version", "--version", "-v":
 		fmt.Printf("orcastack %s\ncommit: %s\nbuilt: %s\n", version, commit, date)
+
 	case "serve":
 		if err := runGateway(args[1:]); err != nil {
 			fmt.Fprintf(os.Stderr, "orcastack serve: %v\n", err)
 			os.Exit(1)
 		}
+
+	case "serve-all":
+		if err := runAllServices(); err != nil {
+			fmt.Fprintf(os.Stderr, "orcastack serve-all: %v\n", err)
+			os.Exit(1)
+		}
+		select {} // keep running
+
 	case "healthcheck":
 		if err := healthcheck(); err != nil {
 			fmt.Fprintf(os.Stderr, "orcastack healthcheck: %v\n", err)
 			os.Exit(1)
 		}
+
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command %q\n\n", args[0])
 		printHelp()
@@ -50,13 +61,46 @@ func printHelp() {
 	fmt.Println("ORCASTACK launcher")
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  orcastack serve [gateway-args...]   Start the packaged gateway service")
+	fmt.Println("  orcastack serve                     Start only the gateway service")
+	fmt.Println("  orcastack serve-all                 Start ALL microservices")
 	fmt.Println("  orcastack healthcheck               Check the configured gateway health endpoint")
 	fmt.Println("  orcastack version                   Print build version")
 	fmt.Println()
 	fmt.Println("Environment:")
 	fmt.Println("  ORCASTACK_GATEWAY_BINARY            Override the packaged orcastack-gateway path")
 	fmt.Println("  ORCASTACK_GATEWAY_BASE              Override the healthcheck base URL (default http://127.0.0.1:8080)")
+}
+
+func runAllServices() error {
+	services := []string{
+		"orcastack-analytics-service",
+		"orcastack-device-orch",
+		"orcastack-hw-automation",
+		"orcastack-secctl",
+		"orcastack-cd-service",
+		"orcastack-gateway",
+		"orcastack-review-service",
+		"orcastack-sw-automation",
+		"orcastack-ci-service",
+		"orcastack-git-service",
+		"orcastack-runner",
+	}
+
+	for _, svc := range services {
+		go func(name string) {
+			fmt.Printf("Starting %s...\n", name)
+			cmd := exec.Command(name)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Stdin = os.Stdin
+			cmd.Env = os.Environ()
+			if err := cmd.Start(); err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to start %s: %v\n", name, err)
+			}
+		}(svc)
+	}
+
+	return nil
 }
 
 func runGateway(args []string) error {
