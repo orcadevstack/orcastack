@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/orcastack/orcastackapi/internal/platform/config"
+	"orcastack/internal/platform/config"
 )
 
 // Manager manages Slack notifications globally

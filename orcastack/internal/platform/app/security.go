@@ -1,20 +1,20 @@
 package app
 
 import (
-	"github.com/orcastack/orcastackapi/internal/platform/config"
-	"github.com/orcastack/orcastackapi/internal/platform/security"
+	"orcastack/internal/platform/config"
+	"orcastack/internal/platform/security"
 )
 
 const (
-	DefaultGatewayIdentity   = security.DefaultGatewayIdentity
-	DefaultGitIdentity       = security.DefaultGitIdentity
-	DefaultReviewIdentity    = security.DefaultReviewIdentity
-	DefaultCIIdentity        = security.DefaultCIIdentity
-	DefaultCDIdentity        = security.DefaultCDIdentity
-	DefaultAnalyticsIdentity = security.DefaultAnalyticsIdentity
-	DefaultRunnerIdentity    = security.DefaultRunnerIdentity
-	DefaultHWAutoIdentity    = security.DefaultHWAutoIdentity
-	DefaultSWAutoIdentity    = security.DefaultSWAutoIdentity
+	DefaultGatewayIdentity    = security.DefaultGatewayIdentity
+	DefaultGitIdentity        = security.DefaultGitIdentity
+	DefaultReviewIdentity     = security.DefaultReviewIdentity
+	DefaultCIIdentity         = security.DefaultCIIdentity
+	DefaultCDIdentity         = security.DefaultCDIdentity
+	DefaultAnalyticsIdentity  = security.DefaultAnalyticsIdentity
+	DefaultRunnerIdentity     = security.DefaultRunnerIdentity
+	DefaultHWAutoIdentity     = security.DefaultHWAutoIdentity
+	DefaultSWAutoIdentity     = security.DefaultSWAutoIdentity
 	DefaultDeviceOrchIdentity = security.DefaultDeviceOrchIdentity
 )
 

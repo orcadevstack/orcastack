@@ -1,1 +1,1 @@
-deb [signed-by=/usr/share/keyrings/orcastack-archive-keyring.gpg] https://atonixcorp.github.io/orcastack/apt stable main
+deb [signed-by=/usr/share/keyrings/orcastack-archive-keyring.gpg] https://orcadevstack.github.io/orcastack/apt stable main

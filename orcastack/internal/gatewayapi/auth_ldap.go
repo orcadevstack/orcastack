@@ -6,7 +6,8 @@ import (
 	"os"
 	"strings"
 
-	platformconfig "github.com/orcastack/orcastackapi/internal/platform/config"
+	platformconfig "orcastack/internal/platform/config"
+
 	ldap "github.com/go-ldap/ldap/v3"
 )
 

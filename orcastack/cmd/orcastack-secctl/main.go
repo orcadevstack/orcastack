@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/orcastack/orcastackapi/internal/platform/security"
+	"orcastack/internal/platform/security"
 )
 
 func main() {

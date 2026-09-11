@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/orcastack/orcastackapi/internal/hwautomation"
-	"github.com/orcastack/orcastackapi/internal/platform/app"
-	"github.com/orcastack/orcastackapi/internal/platform/config"
+	"orcastack/internal/hwautomation"
+	"orcastack/internal/platform/app"
+	"orcastack/internal/platform/config"
 )
 
 func main() {

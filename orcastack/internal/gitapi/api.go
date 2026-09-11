@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	platformconfig "github.com/orcastack/orcastackapi/internal/platform/config"
+	platformconfig "orcastack/internal/platform/config"
 )
 
 type verifyTokenRequest struct {

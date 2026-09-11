@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/orcastack/orcastackapi/internal/platform/app"
-	"github.com/orcastack/orcastackapi/internal/platform/config"
-	"github.com/orcastack/orcastackapi/internal/runnerapi"
+	"orcastack/internal/platform/app"
+	"orcastack/internal/platform/config"
+	"orcastack/internal/runnerapi"
 )
 
 func main() {

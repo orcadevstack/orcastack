@@ -19,15 +19,15 @@ print_header() {
 }
 
 print_error() {
-    echo -e "${RED}❌ Error: $1${NC}"
+    echo -e "${RED} Error: $1${NC}"
 }
 
 print_success() {
-    echo -e "${GREEN}✅ $1${NC}"
+    echo -e "${GREEN} $1${NC}"
 }
 
 print_info() {
-    echo -e "${YELLOW}ℹ️  $1${NC}"
+    echo -e "${YELLOW}  $1${NC}"
 }
 
 # Check if docker is installed

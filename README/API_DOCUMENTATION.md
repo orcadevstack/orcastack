@@ -2,7 +2,7 @@
 
 ## Base URL
 - Development: `http://localhost:8000/api`
-- Production: `https://your-domain.com/api`
+- Production: `https://orcastack.org/api`
 
 ## Authentication
 

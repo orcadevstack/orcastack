@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package orcastack.platform.v1;
 
-option go_package = "github.com/orcastack/orcastackapi/proto/orcastack/platform/v1;platformv1";
+option go_package = "github.com/orcadevstack/orcastack/proto/orcastack/platform/v1;platformv1";
 
 message Repository {
   string id = 1;

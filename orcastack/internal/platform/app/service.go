@@ -13,7 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/orcastack/orcastackapi/internal/platform/security"
+	"orcastack/internal/platform/security"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"

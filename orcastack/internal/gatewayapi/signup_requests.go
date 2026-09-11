@@ -7,19 +7,20 @@ import (
 	"sync"
 	"time"
 
-	platformconfig "github.com/orcastack/orcastackapi/internal/platform/config"
+	platformconfig "orcastack/internal/platform/config"
+
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type signupRequestRecord struct {
-	ID         string     `json:"id"`
-	Username   string     `json:"username"`
-	Email      string     `json:"email"`
-	Status     string     `json:"status"`
-	CreatedAt  string     `json:"created_at"`
-	ReviewedAt *string    `json:"reviewed_at,omitempty"`
-	ReviewedBy string     `json:"reviewed_by,omitempty"`
-	ReviewNote string     `json:"review_note,omitempty"`
+	ID         string  `json:"id"`
+	Username   string  `json:"username"`
+	Email      string  `json:"email"`
+	Status     string  `json:"status"`
+	CreatedAt  string  `json:"created_at"`
+	ReviewedAt *string `json:"reviewed_at,omitempty"`
+	ReviewedBy string  `json:"reviewed_by,omitempty"`
+	ReviewNote string  `json:"review_note,omitempty"`
 }
 
 type signupDecisionRequest struct {
@@ -30,7 +31,7 @@ type signupDecisionRequest struct {
 var signupStore = struct {
 	sync.Mutex
 	db *sql.DB
-}{ }
+}{}
 
 func signupDB() (*sql.DB, error) {
 	signupStore.Lock()
